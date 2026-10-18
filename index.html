@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AUGUST FREE FIRE PANEL & KEY SYSTEM</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            background-color: #030712;
+            font-family: 'Prompt', sans-serif;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Matrix Background */
+        canvas#matrix {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            opacity: 0.35;
+        }
+
+        .cyber-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, transparent 40%, rgba(0,0,0,0.85) 90%);
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        /* Navigation Tab */
+        .tab-navigation {
+            position: fixed;
+            top: 15px;
+            z-index: 20;
+            display: flex;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 6px;
+            border-radius: 30px;
+            border: 1px solid rgba(0, 255, 170, 0.3);
+        }
+
+        .tab-btn {
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: none;
+            background: transparent;
+            color: #a0aec0;
+            font-family: 'Prompt', sans-serif;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .tab-btn.active {
+            background: #00ffaa;
+            color: #000;
+            font-weight: 600;
+            box-shadow: 0 0 10px rgba(0, 255, 170, 0.5);
+        }
+
+        /* Container */
+        .container {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 440px;
+            min-height: 580px;
+            background: rgba(10, 15, 29, 0.85);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(0, 255, 170, 0.3);
+            border-radius: 20px;
+            box-shadow: 0 0 35px rgba(0, 255, 170, 0.2);
+            display: flex;
+            flex-direction: column;
+            padding: 24px 20px;
+            margin: 60px 10px 20px 10px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .brand-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 900;
+            letter-spacing: 3px;
+            color: #00ffaa;
+            text-shadow: 0 0 15px #00ffaa;
+        }
+
+        .subtitle {
+            font-size: 0.75rem;
+            color: #a0aec0;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* Views */
+        .view-section {
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+            flex: 1;
+        }
+
+        .view-section.active {
+            display: flex;
+        }
+
+        /* Forms & Inputs */
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .input-group label {
+            font-size: 0.85rem;
+            color: #00ffaa;
+        }
+
+        .custom-input {
+            width: 100%;
+            padding: 12px 14px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(0, 255, 170, 0.4);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 0.95rem;
+            font-family: 'Orbitron', sans-serif;
+            outline: none;
+        }
+
+        .custom-input:focus {
+            border-color: #00ffaa;
+            box-shadow: 0 0 12px rgba(0, 255, 170, 0.4);
+        }
+
+        /* Buttons */
+        .btn-action {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #00ffaa 0%, #00b377 100%);
+            border: none;
+            border-radius: 10px;
+            color: #000;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 0 15px rgba(0, 255, 170, 0.3);
+        }
+
+        .btn-action:active {
+            transform: scale(0.98);
+        }
+
+        .key-result-box {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px dashed #00ffaa;
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+            word-break: break-all;
+            font-family: 'Orbitron', monospace;
+            color: #00ffaa;
+            font-size: 0.85rem;
+            margin-top: 10px;
+        }
+
+        /* Feature Switches */
+        .menu-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(0, 255, 170, 0.15);
+            padding: 12px 14px;
+            border-radius: 12px;
+        }
+
+        .menu-item.active {
+            border-color: rgba(0, 255, 170, 0.6);
+            background: rgba(0, 255, 170, 0.08);
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 46px;
+            height: 24px;
+        }
+
+        .switch input { opacity: 0; width: 0; height: 0; }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #1e293b;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px; width: 16px;
+            left: 4px; bottom: 4px;
+            background-color: #94a3b8;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider { background-color: rgba(0, 255, 170, 0.2); border: 1px solid #00ffaa; }
+        input:checked + .slider:before { transform: translateX(20px); background-color: #00ffaa; }
+
+        .console-box {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(0, 255, 170, 0.2);
+            border-radius: 10px;
+            padding: 10px;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.75rem;
+            color: #00ffaa;
+            height: 80px;
+            overflow-y: auto;
+        }
+
+        .btn-launch {
+            padding: 14px;
+            background: linear-gradient(135deg, #ff4757 0%, #ff6b81 100%);
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(255, 71, 87, 0.4);
+        }
+
+        .error-msg {
+            color: #ff4757;
+            font-size: 0.85rem;
+            text-align: center;
+        }
+
+        .key-info-badge {
+            font-size: 0.8rem;
+            color: #a0aec0;
+            background: rgba(0,0,0,0.4);
+            padding: 6px 12px;
+            border-radius: 6px;
+            border-left: 3px solid #00ffaa;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="matrix"></canvas>
+    <div class="cyber-overlay"></div>
+
+    <!-- Tab Selection -->
+    <div class="tab-navigation">
+        <button class="tab-btn active" onclick="switchTab('userView')"><i class="fa-solid fa-gamepad"></i> เข้าใช้งาน Panel</button>
+        <button class="tab-btn" onclick="switchTab('adminView')"><i class="fa-solid fa-user-lock"></i> สร้างคีย์ (Admin)</button>
+    </div>
+
+    <div class="container">
+        
+        <div class="header">
+            <div class="brand-name">AUGUST</div>
+            <div class="subtitle">FREE FIRE SYSTEM v2.0</div>
+        </div>
+
+        <!-- 1. ADMIN SECTION (มีระบบล็อกรหัสผ่านแอดมิน) -->
+        <div class="view-section" id="adminView">
+            
+            <!-- ADMIN LOGIN FORM -->
+            <div id="adminAuthBox" style="display: flex; flex-direction: column; gap: 12px;">
+                <h3 style="color: #ff4757; font-size: 1rem; text-align: center;"><i class="fa-solid fa-shield-cat"></i> ยืนยันตัวตนแอดมิน</h3>
+                <div class="input-group">
+                    <label>รหัสผ่านแอดมิน (Admin Password):</label>
+                    <input type="password" id="adminPassInput" class="custom-input" placeholder="กรอกรหัสผ่านแอดมิน...">
+                </div>
+                <div class="error-msg" id="adminPassError"></div>
+                <button class="btn-action" onclick="verifyAdmin()">
+                    <i class="fa-solid fa-right-to-bracket"></i> เข้าสู่ระบบแอดมิน
+                </button>
+            </div>
+
+            <!-- ADMIN GENERATOR MENU (ปลดล็อกเมื่อใส่รหัสผ่านถูก) -->
+            <div id="adminMenuBox" style="display: none; flex-direction: column; gap: 15px;">
+                <h3 style="color: #00ffaa; font-size: 1.1rem;"><i class="fa-solid fa-gears"></i> ระบบสร้างคีย์ (Key Generator)</h3>
+                
+                <div class="input-group">
+                    <label>ชื่อคีย์ หรือ คำนำหน้า (Prefix):</label>
+                    <input type="text" id="genKeyName" class="custom-input" value="FF_18" placeholder="เช่น FF_18">
+                </div>
+
+                <div class="input-group">
+                    <label>กำหนดระยะเวลาใช้งาน:</label>
+                    <select id="genKeyDuration" class="custom-input">
+                        <option value="1">1 ชั่วโมง</option>
+                        <option value="24" selected>1 วัน (24 ชั่วโมง)</option>
+                        <option value="168">7 วัน</option>
+                        <option value="720">30 วัน</option>
+                    </select>
+                </div>
+
+                <button class="btn-action" onclick="generateKey()">
+                    <i class="fa-solid fa-plus-circle"></i> สร้างคีย์ใช้งาน
+                </button>
+
+                <div id="generatedResult" style="display: none;">
+                    <p style="font-size: 0.85rem; color: #a0aec0;">คีย์พร้อมใช้งาน (คัดลอกส่งให้ลูกค้า):</p>
+                    <div class="key-result-box" id="keyOutput">-</div>
+                    <button class="btn-action" style="margin-top: 8px; background: #1e293b; color: #00ffaa; border: 1px solid #00ffaa;" onclick="copyKey()">
+                        <i class="fa-solid fa-copy"></i> คัดลอกคีย์
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- 2. USER LOGIN SECTION (สำหรับผู้ใช้ทั่วไป) -->
+        <div class="view-section active" id="userView">
+            <div id="loginForm" style="display: flex; flex-direction: column; gap: 15px;">
+                <div class="input-group">
+                    <label><i class="fa-solid fa-key"></i> ใส่คีย์เข้าใช้งาน:</label>
+                    <input type="text" id="userKeyInput" class="custom-input" placeholder="วางคีย์ที่ได้รับที่นี่..." autocomplete="off">
+                </div>
+
+                <div class="error-msg" id="loginError"></div>
+
+                <button class="btn-action" onclick="validateAndLogin()">
+                    <i class="fa-solid fa-unlock"></i> เข้าสู่ระบบ
+                </button>
+            </div>
+
+            <!-- 3. PANEL MENU SECTION (เมนูพาแนลเมื่อคีย์ถูกต้อง) -->
+            <div id="panelMenu" style="display: none; flex-direction: column; gap: 15px;">
+                <div class="key-info-badge">
+                    🔑 คีย์: <span id="activeKeyDisplay" style="color:#00ffaa;">-</span><br>
+                    ⏳ หมดอายุ: <span id="expireTimeDisplay" style="color:#ff4757;">-</span>
+                </div>
+
+                <div class="menu-list">
+                    <div class="menu-item" id="m-head">
+                        <div>
+                            <div style="font-weight: 600;">ดูดหัว</div>
+                            <div style="font-size: 0.75rem; color: #00ffaa;">อัตราความแม่นยำ 89%</div>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" onchange="toggleFeature('ดูดหัว 89%', this, 'm-head')">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="menu-item" id="m-ban">
+                        <div>
+                            <div style="font-weight: 600;">กันแบน</div>
+                            <div style="font-size: 0.75rem; color: #00ffaa;">ความปลอดภัย 70%</div>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" onchange="toggleFeature('กันแบน 70%', this, 'm-ban')">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="menu-item" id="m-aim">
+                        <div>
+                            <div style="font-weight: 600;">ช่วยล็อก</div>
+                            <div style="font-size: 0.75rem; color: #00ffaa;">ระดับการล็อก 50%</div>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" onchange="toggleFeature('ช่วยล็อก 50%', this, 'm-aim')">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="console-box" id="consoleBox">
+                    <div>> Key authenticated...</div>
+                </div>
+
+                <button class="btn-launch" onclick="launchGame()">
+                    <i class="fa-solid fa-gamepad"></i> เข้าสู่เกมทันที
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Matrix Background
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピ';
+        const fontSize = 16;
+        let drops = Array(Math.floor(canvas.width / fontSize)).fill(1);
+
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#00ffaa';
+            ctx.font = fontSize + 'px monospace';
+            for (let i = 0; i < drops.length; i++) {
+                const text = chars.charAt(Math.floor(Math.random() * chars.length));
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                drops[i]++;
+            }
+        }
+        setInterval(drawMatrix, 30);
+
+        // Tab Switcher
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.view-section').forEach(view => view.classList.remove('active'));
+            
+            if(tabId === 'userView') {
+                document.querySelectorAll('.tab-btn')[0].classList.add('active');
+            } else {
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+            }
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        // --- ADMIN AUTH SYSTEM ---
+        const ADMIN_PASSWORD = "AUGUST888"; // รหัสผ่านสำหรับแอดมินเท่านั้น
+
+        function verifyAdmin() {
+            const inputPass = document.getElementById('adminPassInput').value.trim();
+            const errBox = document.getElementById('adminPassError');
+
+            if (inputPass === ADMIN_PASSWORD) {
+                document.getElementById('adminAuthBox').style.display = 'none';
+                document.getElementById('adminMenuBox').style.display = 'flex';
+                errBox.innerText = "";
+            } else {
+                errBox.innerText = "❌ รหัสผ่านแอดมินไม่ถูกต้อง!";
+            }
+        }
+
+        // --- KEY GENERATOR SYSTEM (ADMIN) ---
+        function generateKey() {
+            const prefix = document.getElementById('genKeyName').value.trim() || "FF";
+            const hours = parseInt(document.getElementById('genKeyDuration').value);
+            
+            const now = new Date();
+            const expireTime = now.getTime() + (hours * 60 * 60 * 1000);
+            
+            // สร้าง Signature คีย์พร้อมเวลาหมดอายุแบบ Encoded
+            const rawData = `${prefix}_${expireTime}`;
+            const encodedKey = btoa(rawData);
+            
+            document.getElementById('generatedResult').style.display = 'block';
+            document.getElementById('keyOutput').innerText = encodedKey;
+        }
+
+        function copyKey() {
+            const keyText = document.getElementById('keyOutput').innerText;
+            navigator.clipboard.writeText(keyText);
+            alert("คัดลอกคีย์เรียบร้อยแล้ว!");
+        }
+
+        // --- KEY VALIDATION SYSTEM (USER) ---
+        function validateAndLogin() {
+            const inputKey = document.getElementById('userKeyInput').value.trim();
+            const errorMsg = document.getElementById('loginError');
+
+            // กรณีคีย์ตั้งต้น FF_18
+            if (inputKey === "FF_18") {
+                loginSuccess("FF_18", "ถาวร / ไม่จำกัดเวลา");
+                return;
+            }
+
+            try {
+                // ถอดรหัสคีย์เพื่อตรวจสอบเวลาหมดอายุ
+                const decoded = atob(inputKey);
+                const parts = decoded.split('_');
+                
+                if (parts.length < 2) throw new Error("Invalid Key");
+
+                const expireTimestamp = parseInt(parts[parts.length - 1]);
+                const nowTimestamp = new Date().getTime();
+
+                if (isNaN(expireTimestamp)) throw new Error("Invalid Timestamp");
+
+                if (nowTimestamp > expireTimestamp) {
+                    errorMsg.innerText = "❌ คีย์นี้หมดอายุการใช้งานแล้ว!";
+                    return;
+                }
+
+                const expireDate = new Date(expireTimestamp).toLocaleString('th-TH');
+                loginSuccess(parts[0], expireDate);
+
+            } catch (e) {
+                errorMsg.innerText = "❌ คีย์ไม่ถูกต้อง กรุณาตรวจสอบอีกครั้ง";
+            }
+        }
+
+        function loginSuccess(keyName, expireText) {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('panelMenu').style.display = 'flex';
+            document.getElementById('activeKeyDisplay').innerText = keyName;
+            document.getElementById('expireTimeDisplay').innerText = expireText;
+        }
+
+        function toggleFeature(name, chk, id) {
+            const el = document.getElementById(id);
+            const box = document.getElementById('consoleBox');
+            if(chk.checked) {
+                el.classList.add('active');
+                box.innerHTML += `<div>> [ON] ${name}</div>`;
+            } else {
+                el.classList.remove('active');
+                box.innerHTML += `<div>> [OFF] ${name}</div>`;
+            }
+            box.scrollTop = box.scrollHeight;
+        }
+
+        function launchGame() {
+            window.location.href = "freefire://";
+        }
+    </script>
+</body>
+</html>
